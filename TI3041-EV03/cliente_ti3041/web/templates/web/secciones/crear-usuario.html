@@ -1,0 +1,62 @@
+<div class="grid-two">
+    <form class="panel form-panel" method="post" action="{% url 'accion-crear-usuario' %}">
+        {% csrf_token %}
+        <h2>Registrar nuevo usuario</h2>
+        <p class="panel-sub">El usuario se crea consumiendo <code>POST /agregarusuario/</code>.</p>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="username">Nombre de usuario *</label>
+                <input type="text" id="username" name="username" maxlength="150" required>
+            </div>
+            <div class="form-field">
+                <label for="nombre_completo">Nombre completo</label>
+                <input type="text" id="nombre_completo" name="nombre_completo" maxlength="200">
+            </div>
+            <div class="form-field">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" name="email">
+            </div>
+            <div class="form-field">
+                <label for="password">Contraseña *</label>
+                <input type="password" id="password" name="password" required>
+                <small>Mínimo 8 caracteres, no numérica ni demasiado común.</small>
+            </div>
+        </div>
+
+        <fieldset class="form-fieldset">
+            <legend>Permisos iniciales</legend>
+            {% if permisos_list %}
+            <div class="checkbox-grid">
+                {% for permiso in permisos_list %}
+                <label class="checkbox-item">
+                    <input type="checkbox" name="permisos" value="{{ permiso.codigo }}">
+                    <span>
+                        <strong>{{ permiso.nombre }}</strong>
+                        <small>{{ permiso.codigo }}</small>
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No hay permisos creados todavía. Puede crearlos en Gestión de permisos.</p>
+            {% endif %}
+        </fieldset>
+
+        <button type="submit" class="btn btn-primary">Crear usuario</button>
+    </form>
+
+    <aside class="panel info-panel">
+        <h2>Validaciones aplicadas</h2>
+        <ul class="info-list">
+            <li>El nombre de usuario y el correo no pueden estar duplicados.</li>
+            <li>La contraseña se valida con los validadores de Django y se almacena con hash.</li>
+            <li>Los permisos seleccionados se asocian al nuevo usuario.</li>
+            <li>Si un permiso no existe, la API rechaza la solicitud.</li>
+        </ul>
+        <div class="code-block">
+            <span>Endpoint utilizado</span>
+            <code>POST /api/agregarusuario/</code>
+        </div>
+    </aside>
+</div>

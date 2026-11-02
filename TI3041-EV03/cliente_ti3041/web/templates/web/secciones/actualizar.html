@@ -1,0 +1,58 @@
+<div class="grid-two">
+    <form class="panel form-panel" method="post" action="{% url 'accion-actualizar-password' %}">
+        {% csrf_token %}
+        <h2>Cambiar contraseña</h2>
+        <p class="panel-sub">La operación se envía a <code>PUT /actualizar/</code> usando el JWT.</p>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="username">Usuario</label>
+                {% if usuario.is_staff %}
+                <select id="username" name="username">
+                    {% for item in usuarios %}
+                    <option value="{{ item.username }}" {% if item.username == usuario.username %}selected{% endif %}>
+                        @{{ item.username }} · {{ item.nombre|default:item.username }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small>Como administrador puede cambiar la contraseña de otro usuario.</small>
+                {% else %}
+                <input type="text" id="username" value="@{{ usuario.username }}" disabled>
+                <input type="hidden" name="username" value="{{ usuario.username }}">
+                <small>Solo puede cambiar su propia contraseña.</small>
+                {% endif %}
+            </div>
+
+            <div class="form-field">
+                <label for="password_actual">Contraseña actual</label>
+                <input type="password" id="password_actual" name="password_actual">
+                <small>
+                    Obligatoria para cambiar su propia contraseña. Un administrador
+                    puede omitirla al cambiar la de otro usuario.
+                </small>
+            </div>
+
+            <div class="form-field">
+                <label for="password_nueva">Contraseña nueva *</label>
+                <input type="password" id="password_nueva" name="password_nueva" required>
+                <small>Mínimo 8 caracteres, no numérica ni demasiado común.</small>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Actualizar contraseña</button>
+    </form>
+
+    <aside class="panel info-panel">
+        <h2>Seguridad</h2>
+        <ul class="info-list">
+            <li>La contraseña actual se verifica antes de aplicar el cambio.</li>
+            <li>La nueva contraseña pasa por los validadores configurados en la API.</li>
+            <li>Un usuario normal no puede modificar la contraseña de otro.</li>
+            <li>El cambio se guarda en SQLite mediante el modelo <code>Usuario</code>.</li>
+        </ul>
+        <div class="code-block">
+            <span>Endpoint utilizado</span>
+            <code>PUT /api/actualizar/</code>
+        </div>
+    </aside>
+</div>

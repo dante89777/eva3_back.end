@@ -1,0 +1,132 @@
+{% extends 'web/base.html' %}
+
+{% block title %}Panel principal | TI3041{% endblock %}
+{% block body_class %}app-body{% endblock %}
+
+{% block content %}
+<header class="topbar">
+    <div class="topbar-brand">
+        <span class="brand-mark">TI</span>
+        <div>
+            <strong>Panel de gestión</strong>
+            <small>TI3041 · Back End</small>
+        </div>
+    </div>
+    <div class="topbar-user">
+        <div class="user-info">
+            <strong>{{ usuario.nombre|default:usuario.username }}</strong>
+            <span>@{{ usuario.username }}</span>
+        </div>
+        {% if usuario.is_staff %}
+        <span class="badge badge-staff">Administrador</span>
+        {% endif %}
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost">Cerrar sesión</button>
+        </form>
+    </div>
+</header>
+
+<div class="app-layout">
+    <aside class="sidebar">
+        <p class="sidebar-title">Menú principal</p>
+        {% if menu %}
+        <nav class="menu">
+            {% for item in menu %}
+            <a
+                class="menu-item {% if seccion_actual.seccion == item.seccion %}is-active{% endif %}"
+                href="{% url 'dashboard' %}?seccion={{ item.seccion }}"
+            >
+                <span class="menu-dot"></span>
+                <span>
+                    <strong>{{ item.titulo }}</strong>
+                    <small>{{ item.permiso }}</small>
+                </span>
+            </a>
+            {% endfor %}
+        </nav>
+        {% else %}
+        <p class="menu-empty">Este usuario no tiene permisos asociados.</p>
+        {% endif %}
+
+        <div class="sidebar-footer">
+            <span class="status-dot"></span>
+            <span>API: <code>{{ api_base }}</code></span>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        {% if flash %}
+        <div class="alert alert-{{ flash.tipo }}" role="alert">{{ flash.mensaje }}</div>
+        {% endif %}
+        {% for aviso in avisos %}
+        <div class="alert alert-warning" role="alert">{{ aviso }}</div>
+        {% endfor %}
+
+        {% if seccion_actual %}
+        <section class="section-heading">
+            <div>
+                <span class="eyebrow">Sección activa</span>
+                <h1>{{ seccion_actual.titulo }}</h1>
+                <p>{{ seccion_actual.descripcion }}</p>
+            </div>
+            <div class="section-heading-side">
+                <span class="chip">{{ seccion_actual.permiso }}</span>
+                <a class="btn btn-ghost btn-dark" href="{% url 'dashboard' %}">Volver al inicio</a>
+            </div>
+        </section>
+
+        {% include plantilla %}
+        {% else %}
+        <section class="page-heading">
+            <div>
+                <span class="eyebrow">Bienvenido</span>
+                <h1>{{ usuario.nombre|default:usuario.username }}</h1>
+                <p>
+                    Las opciones visibles en el menú fueron entregadas por la API
+                    según los permisos asociados a su cuenta.
+                </p>
+            </div>
+            <div class="permission-summary">
+                <span class="summary-number">{{ menu|length }}</span>
+                <span class="summary-label">opciones habilitadas</span>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Permisos recibidos desde la API</h2>
+            {% if permisos %}
+            <div class="chips">
+                {% for permiso in permisos %}
+                <span class="chip">{{ permiso }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No se recibieron permisos para este usuario.</p>
+            {% endif %}
+        </section>
+
+        <section class="cards">
+            {% for item in menu %}
+            <a class="card" href="{% url 'dashboard' %}?seccion={{ item.seccion }}">
+                <span class="card-permiso">{{ item.permiso }}</span>
+                <h3>{{ item.titulo }}</h3>
+                <p>{{ item.descripcion }}</p>
+                <span class="card-link">Abrir sección</span>
+            </a>
+            {% endfor %}
+        </section>
+
+        {% if not menu %}
+        <section class="panel">
+            <h2>Sin opciones disponibles</h2>
+            <p class="muted">
+                Solicite a un administrador que asocie permisos a su usuario
+                mediante el endpoint <code>asociapermiso</code>.
+            </p>
+        </section>
+        {% endif %}
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

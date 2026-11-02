@@ -1,0 +1,107 @@
+<div class="grid-two">
+    <form class="panel form-panel" method="post" action="{% url 'accion-crear-permiso' %}">
+        {% csrf_token %}
+        <h2>Crear permiso</h2>
+        <p class="panel-sub">Se envía a <code>POST /addpermiso/</code>. El código debe ser único.</p>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="codigo">Código *</label>
+                <input type="text" id="codigo" name="codigo" maxlength="100" placeholder="modulo.accion" required>
+                <small>Ejemplo: <code>ventas.ver</code> o <code>inventario.editar</code>.</small>
+            </div>
+            <div class="form-field">
+                <label for="nombre">Nombre *</label>
+                <input type="text" id="nombre" name="nombre" maxlength="150" required>
+            </div>
+            <div class="form-field">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" rows="3"></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Crear permiso</button>
+    </form>
+
+    <form class="panel form-panel" method="post" action="{% url 'accion-asociar-permiso' %}">
+        {% csrf_token %}
+        <h2>Asociar permisos</h2>
+        <p class="panel-sub">Relaciona permisos con un usuario mediante <code>POST /asociapermiso/</code>.</p>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="username_permiso">Usuario *</label>
+                <select id="username_permiso" name="username" required>
+                    <option value="">Seleccione un usuario</option>
+                    {% for item in usuarios %}
+                    <option value="{{ item.username }}">@{{ item.username }} · {{ item.nombre|default:item.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="accion">Acción *</label>
+                <select id="accion" name="accion">
+                    <option value="asociar">Asociar permisos</option>
+                    <option value="quitar">Quitar permisos</option>
+                </select>
+            </div>
+        </div>
+
+        <fieldset class="form-fieldset">
+            <legend>Permisos *</legend>
+            {% if permisos_list %}
+            <div class="checkbox-grid">
+                {% for permiso in permisos_list %}
+                <label class="checkbox-item">
+                    <input type="checkbox" name="permisos" value="{{ permiso.codigo }}">
+                    <span>
+                        <strong>{{ permiso.nombre }}</strong>
+                        <small>{{ permiso.codigo }}</small>
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No hay permisos disponibles. Cree uno primero.</p>
+            {% endif %}
+        </fieldset>
+
+        <button type="submit" class="btn btn-primary">Aplicar cambios</button>
+    </form>
+</div>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Permisos del sistema</h2>
+            <p class="panel-sub">Total: {{ permisos_list|length }}</p>
+        </div>
+    </div>
+
+    {% if permisos_list %}
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for permiso in permisos_list %}
+                <tr>
+                    <td class="muted-cell">{{ permiso.id }}</td>
+                    <td><code>{{ permiso.codigo }}</code></td>
+                    <td>{{ permiso.nombre }}</td>
+                    <td>{{ permiso.descripcion|default:"Sin descripción" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="muted">No hay permisos creados.</p>
+    {% endif %}
+</section>

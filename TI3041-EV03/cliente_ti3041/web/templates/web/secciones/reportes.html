@@ -1,0 +1,91 @@
+<section class="stats">
+    <article class="stat-card">
+        <span class="stat-label">Usuarios registrados</span>
+        <strong class="stat-value">{{ usuarios|length }}</strong>
+    </article>
+    <article class="stat-card">
+        <span class="stat-label">Permisos del sistema</span>
+        <strong class="stat-value">{{ permisos_list|length }}</strong>
+    </article>
+    <article class="stat-card">
+        <span class="stat-label">Asociaciones usuario-permiso</span>
+        <strong class="stat-value">{{ total_asociaciones }}</strong>
+    </article>
+    <article class="stat-card">
+        <span class="stat-label">Usuarios sin permisos</span>
+        <strong class="stat-value">{{ usuarios_sin_permisos }}</strong>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h2>Resumen de accesos por usuario</h2>
+            <p class="panel-sub">Información consolidada desde la API, sin persistencia local.</p>
+        </div>
+    </div>
+
+    {% if usuarios %}
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Cantidad de permisos</th>
+                    <th>Permisos asignados</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in usuarios %}
+                <tr>
+                    <td><strong>@{{ item.username }}</strong></td>
+                    <td>
+                        {% if item.is_staff %}
+                        <span class="badge badge-staff">Administrador</span>
+                        {% else %}
+                        <span class="badge badge-user">Usuario</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.is_active %}
+                        <span class="badge badge-active">Activo</span>
+                        {% else %}
+                        <span class="badge badge-inactive">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ item.permisos|length }}</td>
+                    <td>
+                        {% if item.permisos %}
+                        <div class="chips chips-compact">
+                            {% for permiso in item.permisos %}
+                            <span class="chip">{{ permiso }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <span class="muted">Sin permisos</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="muted">No hay información disponible para generar el reporte.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>Permisos disponibles</h2>
+    {% if permisos_list %}
+    <div class="chips">
+        {% for permiso in permisos_list %}
+        <span class="chip">{{ permiso.codigo }}</span>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted">No hay permisos creados.</p>
+    {% endif %}
+</section>

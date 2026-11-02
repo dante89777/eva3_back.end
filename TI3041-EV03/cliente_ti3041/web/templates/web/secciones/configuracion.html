@@ -1,0 +1,67 @@
+<div class="grid-two">
+    <section class="panel info-panel">
+        <h2>Configuración de la sesión</h2>
+        <dl class="detail-list">
+            <div>
+                <dt>Usuario autenticado</dt>
+                <dd>@{{ usuario.username }}</dd>
+            </div>
+            <div>
+                <dt>Nombre</dt>
+                <dd>{{ usuario.nombre|default:usuario.username }}</dd>
+            </div>
+            <div>
+                <dt>Rol</dt>
+                <dd>{% if usuario.is_staff %}Administrador{% else %}Usuario{% endif %}</dd>
+            </div>
+            <div>
+                <dt>Permisos activos</dt>
+                <dd>{{ permisos|length }}</dd>
+            </div>
+            <div>
+                <dt>Estado del token</dt>
+                <dd><span class="badge badge-active">JWT activo</span></dd>
+            </div>
+            <div>
+                <dt>API utilizada</dt>
+                <dd><code>{{ api_base }}</code></dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="panel info-panel">
+        <h2>Arquitectura del cliente</h2>
+        <ul class="info-list">
+            <li>Este proyecto no utiliza base de datos ni migraciones.</li>
+            <li>La sesión se almacena en una cookie firmada, no en SQLite.</li>
+            <li>No se utiliza el admin de Django ni formularios automáticos.</li>
+            <li>Las pantallas consumen la API mediante JWT con el encabezado <code>Authorization</code>.</li>
+            <li>Los datos de usuarios y permisos viven únicamente en el Proyecto 1.</li>
+        </ul>
+    </section>
+</div>
+
+<section class="panel">
+    <h2>Endpoints consumidos por este cliente</h2>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Método</th>
+                    <th>Endpoint</th>
+                    <th>Uso en el cliente</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><span class="method method-post">POST</span></td><td><code>/api/autentificar/</code></td><td>Inicio de sesión y obtención del JWT.</td></tr>
+                <tr><td><span class="method method-get">GET</span></td><td><code>/api/perfil/</code></td><td>Validación del token y actualización del menú.</td></tr>
+                <tr><td><span class="method method-get">GET</span></td><td><code>/api/usuarios/</code></td><td>Listado de usuarios.</td></tr>
+                <tr><td><span class="method method-post">POST</span></td><td><code>/api/agregarusuario/</code></td><td>Registro de usuarios.</td></tr>
+                <tr><td><span class="method method-put">PUT</span></td><td><code>/api/actualizar/</code></td><td>Cambio de contraseña.</td></tr>
+                <tr><td><span class="method method-get">GET</span></td><td><code>/api/addpermiso/</code></td><td>Listado de permisos.</td></tr>
+                <tr><td><span class="method method-post">POST</span></td><td><code>/api/addpermiso/</code></td><td>Creación de permisos.</td></tr>
+                <tr><td><span class="method method-post">POST</span></td><td><code>/api/asociapermiso/</code></td><td>Asociación o desasociación de permisos.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
